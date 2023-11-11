@@ -91,7 +91,7 @@ specifiedDate=$(date -d "${view_due_date} ${date_timeframe}" +'%Y-%m-%d')
 # Arguments:
 #   None
 # Outputs:
-#   None
+#   Prints msg if it does not exist or if it is empty
 ##############################################################################
 
 checkForFile() {
@@ -109,13 +109,13 @@ checkForFile() {
 }
 
 
-##############################################################################
+###################################################################################
 # After checking if the storage exists, find a task with the provided date
 # Arguments:
 #   None
 # Outputs:
-#   Any task within a specified date that was found
-##############################################################################
+#   Any task within a specified date that was found or a msg if nothing was found
+###################################################################################
 
 viewTaskDueDate() {
     checkForFile

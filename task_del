@@ -59,7 +59,7 @@ fi
 # Arguments:
 #   None
 # Outputs:
-#   None
+#   Prints msg if it does not exist or if it is empty
 ##############################################################################
 
 checkForFile() {
