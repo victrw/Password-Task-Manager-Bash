@@ -1,0 +1,108 @@
+#!/bin/bash
+#: Title       : task_del
+#: Version     : 1.0
+#: Description : Delete all or certain task specified.
+#: Options
+# Users can delete a specified task name -d
+
+
+#######################################
+# Print a Usage message.
+# Arguments:
+#   None
+# Outputs:
+#   Write a help message
+#######################################
+
+
+usage() {
+    echo "usage: ${0} [-d 'task name to delete']" >&2
+    echo ' -d Delete a specified task name.'
+    exit 1
+}
+
+
+# setting default values
+delete_task_name='false'
+task_name=""
+
+
+# dir path
+storage_file_path="$HOME/Task/"
+# file path
+taskFile="${storage_file_path}/Task_storage"
+
+
+# all options the user can choose from
+while getopts d: OPTION; do
+    case ${OPTION} in
+        d)
+          delete_task_name='true'
+          task_name="${OPTARG}"
+          ;;
+        ?)
+          usage
+          ;;
+esac
+done
+
+
+#add flag to check if there are any non-option arguments
+if [[ "${delete_task_name}" = 'false' && -z "${task_name}" ]]; then
+    usage
+    exit 1
+fi
+
+
+##############################################################################
+# Checks to see if task storage exists and if there is anything inside
+# Arguments:
+#   None
+# Outputs:
+#   None
+##############################################################################
+
+checkForFile() {
+    # check if file exists
+    if [[ ! -e "${storage_file_path}" ]]; then
+        echo "No tasks found."
+        exit 1
+    fi
+
+    # check if file is empty
+    if [[ ! -s "${storage_file_path}" ]]; then
+        echo "No tasks found."
+        exit 1
+    fi
+}
+
+##############################################################################
+# Deletes a task for a specified task name
+# Arguments:
+#   None
+# Outputs:
+#   Prints msg if it was sucessfully deleted
+##############################################################################
+
+deleteTask() {
+    # call function to check if file exists and if there is anything inside
+    checkForFile
+    # check if task name exists
+    findTask=$(grep "Task Name: ${task_name}" "${taskFile}")
+    # if task name does not exist, exit
+    if [[ -z "${findTask}" ]]; then 
+        echo "Task ${task_name} not found."
+        exit 1
+    else
+    # if task name exists, delete it
+    sed -i "/${findTask}/d" ${taskFile}
+    echo "Task ${task_name} has been deleted."
+    fi
+}
+
+
+if [[ "${delete_task_name}" = 'true' ]]; then 
+    deleteTask
+fi 
+
+exit 0

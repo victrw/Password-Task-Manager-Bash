@@ -1,0 +1,88 @@
+#!/bin/bash
+#: Title       : pass_list
+#: Version     : 1.0
+#: Description : Shows a list of all passwords stored in a file.
+#: Options
+# Users can see their list of stored password -s
+
+
+#######################################
+# Print a Usage message.
+# Arguments:
+#   None
+# Outputs:
+#   Write a help message
+#######################################
+
+
+usage() {
+echo " usage:${0} [-s 'all' or 'preferred service'] " >&2
+echo ' -s Prints all stored passwords or certain services if found'
+exit 1
+}
+
+# file path dir for password storage
+storage_file_path="$HOME/etc/top_secret"
+
+# file path for password_storage
+file_path="${storage_file_path}/DONTLOOK"
+
+
+# echo contents of the storage file
+ls_password() {
+        cat "$file_path"
+}
+
+
+# Setting list_password to false
+LIST_PASSWORD='false'
+
+
+# all options the user can choose from
+while getopts s: OPTION; do
+case ${OPTION} in
+    s)
+      LIST_PASSWORD='true'
+      FILTER_PASS="${OPTARG}" 
+      ;;
+    ?)
+      usage
+      ;;
+esac
+done
+
+
+# add flag to check if there are any non-option arguments
+if [[ "$LIST_PASSWORD" == 'false' ]]; then
+    usage
+    exit 1
+fi
+
+
+if [[ "${LIST_PASSWORD}" = 'true' ]]; then
+# if file exists, then call ls_password which will print the contents of the file
+    if [ -e "$file_path" ]; then
+        # if user wants to see all passwords
+        if [[ "$FILTER_PASS" = 'all' ]]; then
+            # call ls_password function
+            ls_password
+        else
+            # filters the file for certain services the user specified
+            result=$(grep -i "Service: $FILTER_PASS" "$file_path")
+            #checks if string is null
+            if [ -z "$result" ]; then
+                echo "Cannot find any passwords for service: $FILTER_PASS"
+                exit 1
+            else
+                echo "$result"
+            fi
+        fi
+        exit 0
+    else
+        # if file doesn't exist, then print error message
+        echo "Cannot find any stored passwords."
+        exit 1
+    fi
+fi
+
+exit 0
